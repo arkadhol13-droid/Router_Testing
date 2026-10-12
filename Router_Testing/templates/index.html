@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Router Optical Power Monitor</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        background: #05070a;
+        background-image:
+            linear-gradient(rgba(0,255,163,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,163,0.04) 1px, transparent 1px);
+        background-size: 28px 28px;
+        color: #c9f9e8;
+        margin: 0;
+        padding: 30px;
+    }
+    .container {
+        max-width: 1150px;
+        margin: 0 auto;
+    }
+    h1 {
+        color: #00ffa3;
+        margin-bottom: 4px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-shadow: 0 0 12px rgba(0,255,163,0.5);
+    }
+    h1::before {
+        content: "▌ ";
+    }
+    p.subtitle {
+        color: #5f8f82;
+        margin-top: 0;
+        margin-bottom: 25px;
+        font-size: 13px;
+    }
+    .card {
+        background: #0b1016;
+        border: 1px solid #14351f;
+        border-radius: 4px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 0 25px rgba(0,255,163,0.06);
+    }
+    .card-title {
+        color: #00ffa3;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        opacity: 0.85;
+        border-bottom: 1px solid #14351f;
+        padding-bottom: 8px;
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 6px;
+        font-weight: 700;
+        color: #7fd9c0;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    input[type=text], input[type=password], textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 3px;
+        border: 1px solid #1c4630;
+        background: #05090c;
+        color: #00ffa3;
+        box-sizing: border-box;
+        font-size: 14px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #00ffa3;
+        box-shadow: 0 0 8px rgba(0,255,163,0.3);
+    }
+    textarea {
+        resize: vertical;
+        min-height: 90px;
+    }
+    ::placeholder { color: #3a5c4f; }
+    .row {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+    .row > div {
+        flex: 1;
+        min-width: 220px;
+    }
+    input[type=file] {
+        margin-top: 5px;
+        color: #7fd9c0;
+        font-size: 13px;
+    }
+    button {
+        margin-top: 22px;
+        background: #00ffa3;
+        color: #05070a;
+        border: none;
+        padding: 13px 30px;
+        border-radius: 3px;
+        font-weight: 800;
+        cursor: pointer;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: 'JetBrains Mono', monospace;
+        transition: 0.15s;
+    }
+    button:hover {
+        background: #ffffff;
+        box-shadow: 0 0 20px rgba(0,255,163,0.6);
+    }
+    button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    .download-btn {
+        display: inline-block;
+        margin-top: 15px;
+        background: transparent;
+        color: #00ffa3;
+        border: 1px solid #00ffa3;
+        padding: 10px 22px;
+        border-radius: 3px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .download-btn:hover {
+        background: #00ffa3;
+        color: #05070a;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 12.5px;
+    }
+    th, td {
+        border: 1px solid #14351f;
+        padding: 9px 10px;
+        text-align: left;
+    }
+    th {
+        background: #0e1a14;
+        color: #00ffa3;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
+    tr:nth-child(even) {
+        background: #0d1310;
+    }
+    tr:hover {
+        background: #10241a;
+    }
+    .status-ok { color: #00ffa3; font-weight: 700; }
+    .status-bad { color: #ff4d6d; font-weight: 700; }
+    .status-warn { color: #ffcc66; font-weight: 700; }
+    .info-line {
+        color: #5f8f82;
+        margin-bottom: 10px;
+        font-size: 12px;
+    }
+    .info-line::before {
+        content: "> ";
+        color: #00ffa3;
+    }
+    .hidden { display: none; }
+
+    /* ---- Scanning animation ---- */
+    .scan-box {
+        text-align: center;
+        padding: 20px 10px;
+    }
+    .scan-line {
+        color: #00ffa3;
+        font-size: 14px;
+        margin-bottom: 18px;
+        min-height: 20px;
+    }
+    .scan-line::after {
+        content: "▌";
+        animation: blink 0.9s steps(1) infinite;
+        margin-left: 3px;
+    }
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+    .progress-track {
+        width: 100%;
+        height: 8px;
+        background: #0f1c14;
+        border: 1px solid #14351f;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+    }
+    .progress-fill {
+        position: absolute;
+        top: 0; left: 0;
+        height: 100%;
+        width: 40%;
+        background: linear-gradient(90deg, transparent, #00ffa3, transparent);
+        animation: sweep 1.3s linear infinite;
+    }
+    @keyframes sweep {
+        0%   { left: -40%; }
+        100% { left: 100%; }
+    }
+    .scan-console {
+        margin-top: 18px;
+        background: #05090c;
+        border: 1px solid #14351f;
+        border-radius: 4px;
+        padding: 12px 14px;
+        text-align: left;
+        font-size: 11.5px;
+        color: #4f8a76;
+        max-height: 130px;
+        overflow: hidden;
+    }
+    .scan-console div { margin-bottom: 4px; }
+    .scan-console div.active { color: #00ffa3; }
+
+    .back-btn {
+        position: fixed;
+        top: 22px;
+        left: 22px;
+        background: transparent;
+        color: #00ffa3;
+        border: 1px solid #00ffa3;
+        padding: 9px 18px;
+        border-radius: 3px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        z-index: 10;
+    }
+    .back-btn:hover {
+        background: #00ffa3;
+        color: #05070a;
+    }
+    .topbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 14px;
+        font-size: 12px;
+        color: #7fd9c0;
+        margin-bottom: 18px;
+    }
+    .topbar a {
+        color: #00ffa3;
+        text-decoration: none;
+        border: 1px solid #00ffa3;
+        padding: 6px 14px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
+    .topbar a:hover { background: #00ffa3; color: #05070a; }
+    .signature {
+        position: fixed;
+        bottom: 14px;
+        right: 18px;
+        font-size: 11px;
+        color: #3a5c4f;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.5px;
+    }
+    .signature span { color: #00ffa3; }
+</style>
+</head>
+<body>
+<button class="back-btn hidden" id="backBtn" onclick="goBack()">&larr; Back</button>
+<div class="container">
+    <div class="topbar">
+        <span>{{ email }}</span>
+        <a href="/dashboard">Dashboard</a>
+        {% if role == 'admin' %}<a href="/admin">Admin Panel</a>{% endif %}
+        <a href="/logout">Logout</a>
+    </div>
+    <h1>Router Optical Power Monitor</h1>
+    <p class="subtitle">Bulk Rx/Tx power check for HFCL routers — enter IPs or upload a CSV</p>
+
+    <div class="card" id="settingsCard">
+        <div class="card-title">Connection Settings</div>
+        <form id="scanForm" enctype="multipart/form-data">
+            <div class="row">
+                <div>
+                    <label>Username</label>
+                    <input type="text" name="username" required placeholder="admin">
+                </div>
+                <div>
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="password">
+                </div>
+            </div>
+
+            <label>Router IPs (separate with commas, spaces, or new lines)</label>
+            <textarea name="ip_list" placeholder="192.168.1.1, 192.168.1.2, 192.168.1.3&#10;or one IP per line"></textarea>
+
+            <label>Or upload a CSV file (IPs in any column)</label>
+            <input type="file" name="csv_file" accept=".csv">
+
+            <br>
+            <button type="submit" id="runBtn">Run Check</button>
+        </form>
+    </div>
+
+    <div class="card hidden" id="scanCard">
+        <div class="card-title">Scanning</div>
+        <div class="scan-box">
+            <div class="scan-line" id="scanLine">Initializing connection sequence</div>
+            <div class="progress-track"><div class="progress-fill"></div></div>
+            <div class="scan-console" id="scanConsole"></div>
+        </div>
+    </div>
+
+    <div class="card hidden" id="resultsCard">
+        <div class="card-title">Scan Results</div>
+        <div class="info-line" id="infoLine"></div>
+        <a class="download-btn" href="/download_csv">Download CSV</a>
+        <div style="overflow-x:auto;">
+        <table>
+            <tr>
+                <th>IP</th>
+                <th>Device Name</th>
+                <th>Connected Site Name</th>
+                <th>Interface</th>
+                <th>Port Status</th>
+                <th>TX Power (dBm)</th>
+                <th>RX Power (dBm)</th>
+                <th>Ethernet/Ext-Eth Compliance</th>
+                <th>Length SMF</th>
+                <th>Wavelength</th>
+                <th>SFP Name</th>
+                <th>Expected TX Range</th>
+                <th>Expected RX Sensitivity</th>
+                <th>TX Status</th>
+                <th>RX Status</th>
+                <th>Result</th>
+            </tr>
+            <tbody id="resultsBody"></tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+<script>
+const form = document.getElementById('scanForm');
+const runBtn = document.getElementById('runBtn');
+const scanCard = document.getElementById('scanCard');
+const resultsCard = document.getElementById('resultsCard');
+const settingsCard = document.getElementById('settingsCard');
+const backBtn = document.getElementById('backBtn');
+const scanLine = document.getElementById('scanLine');
+const scanConsole = document.getElementById('scanConsole');
+const resultsBody = document.getElementById('resultsBody');
+const infoLine = document.getElementById('infoLine');
+
+function goBack() {
+    resultsCard.classList.add('hidden');
+    scanCard.classList.add('hidden');
+    settingsCard.classList.remove('hidden');
+    backBtn.classList.add('hidden');
+    form.reset();
+}
+
+const scanMessages = [
+    "Initializing connection sequence",
+    "Establishing SSH handshake",
+    "Authenticating credentials",
+    "Querying interface transceivers",
+    "Reading optical power levels",
+    "Fetching interface status",
+    "Parsing GP site data",
+    "Compiling results"
+];
+
+let msgIndex = 0;
+let consoleLines = [];
+let scanInterval = null;
+
+function pushConsoleLine(text) {
+    consoleLines.push(text);
+    if (consoleLines.length > 6) consoleLines.shift();
+    scanConsole.innerHTML = consoleLines
+        .map((l, i) => `<div class="${i === consoleLines.length - 1 ? 'active' : ''}">> ${l}</div>`)
+        .join("");
+}
+
+function startScanAnimation() {
+    msgIndex = 0;
+    consoleLines = [];
+    scanLine.textContent = scanMessages[0];
+    pushConsoleLine(scanMessages[0] + " ...");
+    scanInterval = setInterval(() => {
+        msgIndex = (msgIndex + 1) % scanMessages.length;
+        scanLine.textContent = scanMessages[msgIndex];
+        pushConsoleLine(scanMessages[msgIndex] + " ...");
+    }, 1100);
+}
+
+function stopScanAnimation() {
+    clearInterval(scanInterval);
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    runBtn.disabled = true;
+    runBtn.textContent = "Scanning...";
+    settingsCard.classList.add('hidden');
+    resultsCard.classList.add('hidden');
+    scanCard.classList.remove('hidden');
+    startScanAnimation();
+
+    const formData = new FormData(form);
+
+    try {
+        const resp = await fetch('/run', { method: 'POST', body: formData });
+        const data = await resp.json();
+
+        stopScanAnimation();
+        scanCard.classList.add('hidden');
+
+        infoLine.textContent = `${data.ip_count} IP(s) scanned — ${data.results.length} row(s) returned`;
+        resultsBody.innerHTML = data.results.map(r => {
+            let cls = 'status-warn';
+            if (r['Result'] === 'OK') cls = 'status-ok';
+            else if (r['Result'].includes('Down')) cls = 'status-bad';
+
+            const pcls = v => v === 'Good' ? 'status-ok'
+                            : v === 'Need Attention' ? 'status-bad'
+                            : 'status-warn';
+            const txs = r['TX Status'] || 'Unknown';
+            const rxs = r['RX Status'] || 'Unknown';
+
+            return `<tr>
+                <td>${r['IP']}</td>
+                <td>${r['Device Name']}</td>
+                <td>${r['GP Site Name']}</td>
+                <td>${r['Interface']}</td>
+                <td>${r['Port Status']}</td>
+                <td>${r['TX Power (dBm)']}</td>
+                <td>${r['RX Power (dBm)']}</td>
+                <td>${r['Ethernet/Ext-Eth Compliance'] || ''}</td>
+                <td>${r['Length SMF'] || ''}</td>
+                <td>${r['Wavelength'] || ''}</td>
+                <td>${r['SFP Name'] || ''}</td>
+                <td>${r['Expected TX Range (dBm)'] || ''}</td>
+                <td>${r['Expected RX Sensitivity (dBm)'] || ''}</td>
+                <td class="${pcls(txs)}">${txs}</td>
+                <td class="${pcls(rxs)}">${rxs}</td>
+                <td class="${cls}">${r['Result']}</td>
+            </tr>`;
+        }).join("");
+        resultsCard.classList.remove('hidden');
+        backBtn.classList.remove('hidden');
+    } catch (err) {
+        stopScanAnimation();
+        scanCard.classList.add('hidden');
+        settingsCard.classList.remove('hidden');
+        alert("Error running scan: " + err);
+    }
+
+    runBtn.disabled = false;
+    runBtn.textContent = "Run Check";
+});
+</script>
+<div class="signature">Powered by <span>Arka</span></div>
+</body>
+</html>

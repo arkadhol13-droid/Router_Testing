@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login - Router Optical Power Monitor</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+    * { box-sizing: border-box; }
+    body {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        background: #05070a;
+        background-image:
+            linear-gradient(rgba(0,255,163,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,163,0.04) 1px, transparent 1px);
+        background-size: 28px 28px;
+        color: #c9f9e8;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+    .card {
+        background: #0b1016;
+        border: 1px solid #14351f;
+        border-radius: 6px;
+        padding: 35px;
+        width: 100%;
+        max-width: 380px;
+        box-shadow: 0 0 30px rgba(0,255,163,0.08);
+    }
+    h1 {
+        color: #00ffa3;
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0 0 4px;
+        text-shadow: 0 0 12px rgba(0,255,163,0.5);
+    }
+    h1::before { content: "▌ "; }
+    p.subtitle {
+        color: #5f8f82;
+        font-size: 12px;
+        margin: 0 0 24px;
+    }
+    label {
+        display: block;
+        margin-top: 15px;
+        margin-bottom: 6px;
+        font-weight: 700;
+        color: #7fd9c0;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    input[type=email], input[type=password] {
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 3px;
+        border: 1px solid #1c4630;
+        background: #05090c;
+        color: #00ffa3;
+        font-size: 14px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    input:focus { outline: none; border-color: #00ffa3; box-shadow: 0 0 8px rgba(0,255,163,0.3); }
+    button {
+        margin-top: 22px;
+        width: 100%;
+        background: #00ffa3;
+        color: #05070a;
+        border: none;
+        padding: 12px;
+        border-radius: 3px;
+        font-weight: 800;
+        cursor: pointer;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    button:hover { background: #ffffff; box-shadow: 0 0 20px rgba(0,255,163,0.6); }
+    .flash {
+        background: #1a0f10;
+        border: 1px solid #4a1b28;
+        color: #ff8fa3;
+        padding: 10px 12px;
+        border-radius: 4px;
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+    .link-row {
+        margin-top: 18px;
+        text-align: center;
+        font-size: 12px;
+        color: #5f8f82;
+    }
+    .link-row a { color: #00ffa3; text-decoration: none; }
+    .link-row a:hover { text-decoration: underline; }
+    .signature {
+        position: fixed;
+        bottom: 14px;
+        right: 18px;
+        font-size: 11px;
+        color: #3a5c4f;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.5px;
+    }
+    .signature span { color: #00ffa3; }
+</style>
+</head>
+<body>
+<div class="card">
+    <h1>Router Optical Power Monitor</h1>
+    <p class="subtitle">Sign in to continue</p>
+
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for m in messages %}
+          <div class="flash">{{ m }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <label>Email</label>
+        <input type="email" name="email" required placeholder="name@company.com">
+        <label>Password</label>
+        <input type="password" name="password" required placeholder="Password">
+        <button type="submit">Log In</button>
+    </form>
+
+    <div class="link-row">Don't have an account? <a href="/register">Register here</a></div>
+</div>
+<div class="signature">Powered by <span>Arka</span></div>
+</body>
+</html>

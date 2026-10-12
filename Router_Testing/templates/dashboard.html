@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard - Router Optical Power Monitor</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+    * { box-sizing: border-box; }
+    body {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        background: #05070a;
+        background-image:
+            linear-gradient(rgba(0,255,163,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,163,0.04) 1px, transparent 1px);
+        background-size: 28px 28px;
+        color: #c9f9e8;
+        margin: 0;
+        padding: 30px;
+    }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .topbar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 14px;
+        font-size: 12px;
+        color: #7fd9c0;
+        margin-bottom: 18px;
+    }
+    .topbar a {
+        color: #00ffa3;
+        text-decoration: none;
+        border: 1px solid #00ffa3;
+        padding: 6px 14px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
+    .topbar a:hover { background: #00ffa3; color: #05070a; }
+    h1 {
+        color: #00ffa3;
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0 0 4px;
+        text-shadow: 0 0 12px rgba(0,255,163,0.5);
+    }
+    h1::before { content: "▌ "; }
+    p.subtitle { color: #5f8f82; font-size: 12px; margin: 0 0 22px; }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: #0b1016;
+        border: 1px solid #14351f;
+        border-radius: 6px;
+        padding: 16px;
+        box-shadow: 0 0 20px rgba(0,255,163,0.05);
+    }
+    .stat-label {
+        color: #5f8f82;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+    }
+    .stat-value { font-size: 26px; font-weight: 800; }
+    .v-green { color: #00ffa3; }
+    .v-red { color: #ff4d6d; }
+    .v-yellow { color: #ffcc66; }
+    .v-cyan { color: #7fd9c0; }
+    .card {
+        background: #0b1016;
+        border: 1px solid #14351f;
+        border-radius: 4px;
+        padding: 22px;
+        margin-bottom: 22px;
+        box-shadow: 0 0 25px rgba(0,255,163,0.06);
+    }
+    .card-title {
+        color: #00ffa3;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #14351f;
+        padding-bottom: 8px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    th, td { border: 1px solid #14351f; padding: 8px 10px; text-align: left; }
+    th { background: #0e1a14; color: #00ffa3; text-transform: uppercase; font-size: 11px; }
+    tr:nth-child(even) { background: #0d1310; }
+    .status-ok { color: #00ffa3; font-weight: 700; }
+    .status-bad { color: #ff4d6d; font-weight: 700; }
+    .status-warn { color: #ffcc66; font-weight: 700; }
+    .empty { color: #5f8f82; font-size: 13px; }
+    .signature {
+        position: fixed;
+        bottom: 14px;
+        right: 18px;
+        font-size: 11px;
+        color: #3a5c4f;
+    }
+    .signature span { color: #00ffa3; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <span>{{ email }}</span>
+        {% if role == 'admin' %}<a href="/admin">Admin Panel</a>{% endif %}
+        <a href="/">Scanner</a>
+        <a href="/logout">Logout</a>
+    </div>
+    <h1>Dashboard</h1>
+    <p class="subtitle">Summary of the most recent scan</p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Routers Scanned</div>
+            <div class="stat-value v-cyan">{{ total_scanned_ips }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Interfaces Up</div>
+            <div class="stat-value v-green">{{ up_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Router Down</div>
+            <div class="stat-value v-red">{{ down_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">OK Results</div>
+            <div class="stat-value v-green">{{ ok_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Auth Failed</div>
+            <div class="stat-value v-yellow">{{ auth_fail_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Need Attention</div>
+            <div class="stat-value v-red">{{ need_attention_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Rows</div>
+            <div class="stat-value v-cyan">{{ total_rows }}</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Recent Scan Entries</div>
+        {% if recent|length == 0 %}
+            <div class="empty">No scans run yet. Go to the Scanner page and run a check first.</div>
+        {% else %}
+        <table>
+            <tr>
+                <th>IP</th>
+                <th>Device Name</th>
+                <th>Interface</th>
+                <th>Port Status</th>
+                <th>TX Power</th>
+                <th>RX Power</th>
+                <th>TX Status</th>
+                <th>RX Status</th>
+                <th>Result</th>
+            </tr>
+            {% for r in recent %}
+            <tr>
+                <td>{{ r["IP"] }}</td>
+                <td>{{ r["Device Name"] }}</td>
+                <td>{{ r["Interface"] }}</td>
+                <td>{{ r["Port Status"] }}</td>
+                <td>{{ r["TX Power (dBm)"] }}</td>
+                <td>{{ r["RX Power (dBm)"] }}</td>
+                <td class="{% if r.get('TX Status')=='Good' %}status-ok{% elif r.get('TX Status')=='Need Attention' %}status-bad{% else %}status-warn{% endif %}">
+                    {{ r.get("TX Status", "Unknown") }}
+                </td>
+                <td class="{% if r.get('RX Status')=='Good' %}status-ok{% elif r.get('RX Status')=='Need Attention' %}status-bad{% else %}status-warn{% endif %}">
+                    {{ r.get("RX Status", "Unknown") }}
+                </td>
+                <td class="{% if r['Result']=='OK' %}status-ok{% elif 'Down' in r['Result'] %}status-bad{% else %}status-warn{% endif %}">
+                    {{ r["Result"] }}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</div>
+<div class="signature">Powered by <span>Arka</span></div>
+</body>
+</html>

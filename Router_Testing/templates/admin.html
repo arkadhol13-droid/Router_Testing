@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel - Router Optical Power Monitor</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+    * { box-sizing: border-box; }
+    body {
+        font-family: 'JetBrains Mono', 'Courier New', monospace;
+        background: #05070a;
+        background-image:
+            linear-gradient(rgba(0,255,163,0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,163,0.04) 1px, transparent 1px);
+        background-size: 28px 28px;
+        color: #c9f9e8;
+        margin: 0;
+        padding: 30px;
+    }
+    .container { max-width: 950px; margin: 0 auto; }
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+    h1 {
+        color: #00ffa3;
+        font-size: 20px;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 0 0 12px rgba(0,255,163,0.5);
+    }
+    h1::before { content: "▌ "; }
+    .topbar-right { display: flex; align-items: center; gap: 14px; font-size: 12px; color: #7fd9c0; }
+    .topbar-right a {
+        color: #00ffa3;
+        text-decoration: none;
+        border: 1px solid #00ffa3;
+        padding: 6px 14px;
+        border-radius: 3px;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.5px;
+    }
+    .topbar-right a:hover { background: #00ffa3; color: #05070a; }
+    .card {
+        background: #0b1016;
+        border: 1px solid #14351f;
+        border-radius: 4px;
+        padding: 22px;
+        margin-bottom: 22px;
+        box-shadow: 0 0 25px rgba(0,255,163,0.06);
+    }
+    .card-title {
+        color: #00ffa3;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #14351f;
+        padding-bottom: 8px;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border: 1px solid #14351f; padding: 9px 10px; text-align: left; }
+    th { background: #0e1a14; color: #00ffa3; text-transform: uppercase; font-size: 11px; }
+    tr:nth-child(even) { background: #0d1310; }
+    .empty { color: #5f8f82; font-size: 13px; padding: 8px 0; }
+    button.act {
+        border: none;
+        padding: 7px 14px;
+        border-radius: 3px;
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-family: 'JetBrains Mono', monospace;
+        margin-right: 6px;
+    }
+    .btn-approve { background: #00ffa3; color: #05070a; }
+    .btn-approve:hover { background: #ffffff; }
+    .btn-reject { background: transparent; color: #ff4d6d; border: 1px solid #ff4d6d; }
+    .btn-reject:hover { background: #ff4d6d; color: #1a0508; }
+    .btn-kick { background: transparent; color: #ffcc66; border: 1px solid #ffcc66; }
+    .btn-kick:hover { background: #ffcc66; color: #1a1408; }
+    .signature {
+        position: fixed;
+        bottom: 14px;
+        right: 18px;
+        font-size: 11px;
+        color: #3a5c4f;
+    }
+    .signature span { color: #00ffa3; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="topbar">
+        <h1>Admin Panel</h1>
+        <div class="topbar-right">
+            <span>{{ admin_email }}</span>
+            <a href="/">Scanner</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Pending Approval ({{ pending|length }})</div>
+        {% if pending|length == 0 %}
+            <div class="empty">No pending requests.</div>
+        {% else %}
+        <table>
+            <tr><th>Email</th><th>Requested On</th><th>Action</th></tr>
+            {% for u in pending %}
+            <tr>
+                <td>{{ u["email"] }}</td>
+                <td>{{ u["created_at"] }}</td>
+                <td>
+                    <form style="display:inline" method="POST" action="/admin/approve/{{ u['id'] }}">
+                        <button class="act btn-approve" type="submit">Accept</button>
+                    </form>
+                    <form style="display:inline" method="POST" action="/admin/reject/{{ u['id'] }}">
+                        <button class="act btn-reject" type="submit">Reject</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <div class="card-title">Approved Users ({{ approved|length }})</div>
+        {% if approved|length == 0 %}
+            <div class="empty">No approved users yet.</div>
+        {% else %}
+        <table>
+            <tr><th>Email</th><th>Approved Since</th><th>Action</th></tr>
+            {% for u in approved %}
+            <tr>
+                <td>{{ u["email"] }}</td>
+                <td>{{ u["created_at"] }}</td>
+                <td>
+                    <form style="display:inline" method="POST" action="/admin/kickout/{{ u['id'] }}"
+                          onsubmit="return confirm('Kick out this user? They will lose access immediately.');">
+                        <button class="act btn-kick" type="submit">Kick Out</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</div>
+<div class="signature">Powered by <span>Arka</span></div>
+</body>
+</html>
