@@ -1,10 +1,10 @@
-# 🚀 Router Testing & Optical Power Monitoring Tool
+#  Router Testing & Optical Power Monitoring Tool
 
 **A Python Flask-based application for telecom network diagnostics, router interface monitoring, and SFP optical power analysis.**
 
 This project simplifies router testing by collecting network interface status, SFP module information, and optical transmit/receive power readings through SSH-based automation. It helps network and telecom operations teams organize diagnostic results and generate structured reports efficiently.
 
-## ✨ Key Features
+##  Key Features
 
 - **Router Connectivity Testing** — Connect to authorized network devices through SSH.
 - **Interface Status Monitoring** — Identify interfaces that are UP or DOWN.
@@ -26,7 +26,7 @@ This project simplifies router testing by collecting network interface status, S
 | HTML & CSS | Web interface |
 | CSV | Diagnostic report export |
 
-## 🏗️ How It Works
+##  How It Works
 
 1. Open the web application and provide the required router connection details.
 2. Connect to an authorized network device through SSH.
@@ -41,7 +41,7 @@ This project simplifies router testing by collecting network interface status, S
 Clone the repository:
 
 ```bash
-git clone YOUR_REPOSITORY_URL
+git clone https://github.com/arkadhol13-droid/Router_Testing
 cd Router_Testing
 ```
 
